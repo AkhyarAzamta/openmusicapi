@@ -1,7 +1,7 @@
 {
   "name": "openmusicapi",
   "version": "1.0.0",
-  "description": "Proyek Pertama Dicoding Fundamental Aplikasi Back-End (Intermediate)",
+  "description": "Belajar Fundamental Aplikasi Back-End",
   "main": "server.js",
   "scripts": {
     "start-prod": "NODE_ENV=production node ./src/server.js",

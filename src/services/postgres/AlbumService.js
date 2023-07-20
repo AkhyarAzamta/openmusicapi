@@ -1,6 +1,5 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
-
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
@@ -13,7 +12,11 @@ class AlbumService {
     const id = nanoid(16);
     const query = {
       text: "INSERT INTO albums VALUES($1, $2, $3) RETURNING id",
-      values: [id, name, year],
+      values: [
+        id, 
+        name, 
+        year
+      ],
     }
 
     const result = await this._pool.query(query);
@@ -30,9 +33,7 @@ class AlbumService {
       text: "SELECT id, title, performer FROM songs WHERE \"albumId\"=$1",
       values: [id],
     }
-
     const result = await this._pool.query(query);
-
     return result.rows;
   }
 
@@ -41,7 +42,6 @@ class AlbumService {
       text: "SELECT * FROM albums WHERE id=$1",
       values: [id],
     }
-
 
     const result = await this._pool.query(query);
 

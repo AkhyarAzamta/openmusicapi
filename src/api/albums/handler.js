@@ -1,5 +1,4 @@
 class AlbumsHandler {
-
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
@@ -21,9 +20,8 @@ class AlbumsHandler {
 
   async getAlbumByIdHandler(request, h) {
     const { albumId } = request.params;
-
-    const album = await this._service.getAlbumById(albumId);
     const songs = await this._service.getSongByAlbumId(albumId);
+    const album = await this._service.getAlbumById(albumId);
 
     album["songs"] = songs;
 
@@ -35,7 +33,6 @@ class AlbumsHandler {
 
   async updateAlbumByIdHandler(request, h) {
     this._validator.validateAlbumPayload(request.payload);
-
     const { name, year } = request.payload;
     const { albumId } = request.params;
 

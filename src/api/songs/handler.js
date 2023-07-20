@@ -27,9 +27,7 @@ class SongsHandler {
     const response = h.response({
       status: 'success',
       message: 'Lagu berhasil dibuat',
-      data: {
-        songId,
-      }
+      data: { songId }
     });
     response.code(201);
     return response
@@ -54,22 +52,17 @@ class SongsHandler {
 
     return {
       status: 'success',
-      data: {
-        songs,
-      }
+      data: { songs }
     }
   }
 
   async getSongByIdHandler(request, h) {
     const { id } = request.params;
-
     const song = await this._service.getSongById(id);
 
     return {
       status: 'success',
-      data: {
-        song,
-      }
+      data: { song }
     };
   }
 
@@ -97,7 +90,6 @@ class SongsHandler {
 
   async deleteSongByIdHandler(request, h) {
     const { id } = request.params;
-
     await this._service.deleteSongById(id);
 
     return {

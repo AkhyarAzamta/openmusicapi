@@ -12,7 +12,8 @@ const songs = require('./api/songs');
 const ClientError = require('./exceptions/ClientError');
 
 // Memuat validator untuk skema validasi album dan lagu (AlbumValidator, SongValidator)
-const { AlbumValidator, SongValidator } = require('./validator/openmusic');
+const { AlbumValidator } = require('./validator/openmusic/album');
+const { SongValidator } = require('./validator/openmusic/song');
 
 // Memuat kelas service untuk mengakses data album dan lagu dari database Postgres (AlbumService, SongService)
 const AlbumService = require('./services/postgres/AlbumService');

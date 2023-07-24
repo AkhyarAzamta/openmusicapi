@@ -138,7 +138,7 @@ class SongService {
     const result = await this._pool.query(query);
 
     // Jika lagu dengan id yang diberikan tidak ditemukan (result.rows.length = 0), lempar NotFoundError
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
     }
   }

@@ -8,24 +8,9 @@ class SongsHandler {
   // Handler untuk menambahkan lagu baru
   async postSongHandler(request, h) {
     this._validator.validateSongPayload(request.payload); // Validasi payload request menggunakan validator
-    const { 
-      title, 
-      year, 
-      performer, 
-      genre, 
-      duration = 0, 
-      albumId = "" 
-    } = request.payload;
 
     // Tambahkan lagu menggunakan service dengan data dari request payload
-    const songId = await this._service.addSong({ 
-      title, 
-      year, 
-      performer, 
-      genre, 
-      duration, 
-      albumId 
-    });
+    const songId = await this._service.addSong(request.payload);
 
     const response = h.response({
       status: 'success',

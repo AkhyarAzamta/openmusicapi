@@ -1,99 +1,147 @@
-// Memuat konfigurasi environment dari file .env
-require('dotenv').config();
+// mengimpor dotenv dan menjalankan konfigurasinya
+require("dotenv").config();
 
-// Memuat library Hapi.js
-const Hapi = require('@hapi/hapi');
+const Hapi = require("@hapi/hapi");
+const Jwt = require("@hapi/jwt");
 
-// Memuat modul untuk fitur albums dan songs
-const albums = require('./api/albums');
-const songs = require('./api/songs');
+// songs
+const songs = require("./api/songs");
+const SongsService = require("./services/postgres/SongService");
+const SongsValidator = require("./validator/song");
 
-// Memuat class untuk penanganan error dari klien (ClientError)
-const ClientError = require('./exceptions/ClientError');
+// albums
+const albums = require("./api/albums");
+const AlbumsService = require("./services/postgres/AlbumService");
+const AlbumsValidator = require("./validator/album");
 
-// Memuat validator untuk skema validasi album dan lagu (AlbumValidator, SongValidator)
-const { AlbumValidator } = require('./validator/openmusic/album');
-const { SongValidator } = require('./validator/openmusic/song');
+// users
+const users = require("./api/users");
+const UsersService = require("./services/postgres/UsersService");
+const UsersValidator = require("./validator/user");
 
-// Memuat kelas service untuk mengakses data album dan lagu dari database Postgres (AlbumService, SongService)
-const AlbumService = require('./services/postgres/AlbumService');
-const SongService = require('./services/postgres/SongService');
+// authentications
+const authentications = require("./api/authentications");
+const AuthenticationsService = require("./services/postgres/AuthenticationsService");
+const TokenManager = require("./tokenize/TokenManager");
+const AuthenticationsValidator = require("./validator/authentication");
 
-// Fungsi inisialisasi server
+// collaborations
+const collaborations = require("./api/collaborations");
+const CollaborationsService = require("./services/postgres/CollaborationsService");
+const CollaborationsValidator = require("./validator/collaboration");
+
+// playlists
+const playlists = require("./api/playlists");
+const PlaylistsService = require("./services/postgres/PlaylistsService");
+const PlaylistsValidator = require("./validator/playlist");
+
+// playlistsongs
+const playlistsongs = require("./api/playlistsongs");
+const PlaylistsongsService = require("./services/postgres/PlaylistsSongService");
+const PlaylistsongsValidator = require("./validator/playlistsong");
+
 const init = async () => {
-  // Membuat instance dari AlbumService dan SongService
-  const albumService = new AlbumService();
-  const songService = new SongService();
+    const collaborationsService = new CollaborationsService();
+    const albumsService = new AlbumsService();
+    const songsService = new SongsService();
+    const usersService = new UsersService();
+    const authenticationsService = new AuthenticationsService();
+    const playlistsService = new PlaylistsService(collaborationsService);
+    const playlistsongsService = new PlaylistsongsService();
 
-  // Membuat instance dari server Hapi.js
-  const server = Hapi.server({
-    port: process.env.PORT, // Menggunakan port yang diambil dari environment variable
-    host: process.env.HOST, // Menggunakan host yang diambil dari environment variable
+    const server = Hapi.server({
+        port: process.env.PORT,
+        host: process.env.HOST,
+        routes: {
+            cors: {
+                origin: ["*"],
+            },
+        },
+    });
 
-    routes: {
-      cors: {
-        origin: ['*'], // Mengizinkan semua origin untuk melakukan CORS request
-      },
-    },
-  });
+    // registrasi plugin eksternal
+    await server.register([
+        {
+            plugin: Jwt,
+        },
+    ]);
 
-  // Melakukan registrasi plugin untuk fitur albums dan songs
-  await server.register([
-    {
-      plugin: albums,
-      options: {
-        service: albumService, // Menggunakan instance AlbumService sebagai service
-        validator: AlbumValidator, // Menggunakan AlbumValidator sebagai validator
-      }
-    },
-    {
-      plugin: songs,
-      options: {
-        service: songService, // Menggunakan instance SongService sebagai service
-        validator: SongValidator, // Menggunakan SongValidator sebagai validator
-      }
-    }
-  ]);
+    // mendefinisikan strategy otentikasi jwt
+    server.auth.strategy("playlistsapp_jwt", "jwt", {
+        keys: process.env.ACCESS_TOKEN_KEY,
+        verify: {
+            aud: false,
+            iss: false,
+            sub: false,
+            maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+        },
+        validate: (artifacts) => ({
+            isValid: true,
+            credentials: {
+                id: artifacts.decoded.payload.id,
+            },
+        }),
+    });
 
-  // Menambahkan extention point pada server untuk penanganan error
-  server.ext('onPreResponse', (request, h) => {
-    const { response } = request;
+    await server.register([
+        {
+            plugin: albums,
+            options: {
+                service: albumsService,
+                validator: AlbumsValidator,
+            },
+        },
+        {
+            plugin: songs,
+            options: {
+                service: songsService,
+                validator: SongsValidator,
+            },
+        },
+        {
+            plugin: users,
+            options: {
+                service: usersService,
+                validator: UsersValidator,
+            },
+        },
+        {
+            plugin: authentications,
+            options: {
+                authenticationsService,
+                usersService,
+                tokenManager: TokenManager,
+                validator: AuthenticationsValidator,
+            },
+        },
+        {
+            plugin: collaborations,
+            options: {
+                collaborationsService,
+                playlistsService,
+                validator: CollaborationsValidator,
+            },
+        },
+        {
+            plugin: playlists,
+            options: {
+                playlistsService,
+                usersService,
+                validator: PlaylistsValidator,
+            },
+        },
+        {
+            plugin: playlistsongs,
+            options: {
+                playlistsongsService,
+                playlistsService,
+                validator: PlaylistsongsValidator,
+            },
+        },
+    ]);
 
-    if (response instanceof Error) {
-      // Penanganan client error secara internal.
-      if (response instanceof ClientError) {
-        const newResponse = h.response({
-          status: 'fail',
-          message: response.message,
-        });
+    await server.start();
+    console.log(`Server berjalan pada ${server.info.uri}`);
+};
 
-        newResponse.code(response.statusCode);
-        return newResponse;
-      }
-
-      // Mempertahankan penanganan client error oleh Hapi secara native, seperti 404, dll.
-      if (!response.isServer) {
-        return h.continue;
-      }
-
-      // Penanganan server error sesuai kebutuhan
-      const newResponse = h.response({
-        status: 'error',
-        message: 'Terjadi kegagalan pada server kami',
-      });
-
-      newResponse.code(500);
-      return newResponse;
-    }
-
-    // Jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
-    return h.continue;
-  });
-
-  // Memulai server
-  await server.start();
-  console.log(`Server berjalan pada ${server.info.uri}`);
-}
-
-// Jalankan inisialisasi server
 init();

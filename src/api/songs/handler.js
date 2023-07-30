@@ -1,5 +1,5 @@
-const autoBind = require('auto-bind');
 const handleError = require("../../exceptions/handleError");
+const autoBind = require('auto-bind');
 
 class SongsHandler {
   constructor(service, validator) {

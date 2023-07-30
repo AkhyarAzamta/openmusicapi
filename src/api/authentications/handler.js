@@ -1,5 +1,5 @@
 const autoBind = require('auto-bind');
-const handleError = require("../../exceptions/handleError");
+// const handleError = require("../../exceptions/handleError");
 
 class AuthenticationsHandler {
   constructor(authenticationsService, usersService, tokenManager, validator) {
@@ -10,7 +10,7 @@ class AuthenticationsHandler {
     autoBind(this); // mem-bind nilai this untuk seluruh method sekaligus
   }
   async postAuthenticationHandler(request, h) {
-    try {
+    // try {
       this._validator.validatePostAuthenticationPayload(request.payload);
       const { username, password } = request.payload;
       const userId = await this._usersService.verifyUserCredential(username, password);
@@ -27,12 +27,12 @@ class AuthenticationsHandler {
       });
       response.code(201);
       return response;
-    } catch (error) {
-      return handleError(error, h);
-    }
+    // } catch (error) {
+    //   return handleError(error, h);
+    // }
   }
-  async putAuthenticationHandler(request, h) {
-    try {
+  async putAuthenticationHandler(request) {
+    // try {
       this._validator.validatePutAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
       await this._authenticationsService.verifyRefreshToken(refreshToken);
@@ -43,12 +43,12 @@ class AuthenticationsHandler {
         message: "Access Token berhasil diperbarui",
         data: { accessToken },
       };
-    } catch (error) {
-      return handleError(error, h);
-    }
+    // } catch (error) {
+    //   return handleError(error, h);
+    // }
   }
-  async deleteAuthenticationHandler(request, h) {
-    try {
+  async deleteAuthenticationHandler(request) {
+    // try {
       this._validator.validateDeleteAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
       await this._authenticationsService.verifyRefreshToken(refreshToken);
@@ -57,9 +57,9 @@ class AuthenticationsHandler {
         status: "success",
         message: "Refresh token berhasil dihapus",
       };
-    } catch (error) {
-      return handleError(error, h);
-    }
+    // } catch (error) {
+    //   return handleError(error, h);
+    // }
   }
 }
 

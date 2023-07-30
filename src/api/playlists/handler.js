@@ -1,15 +1,13 @@
 const autoBind = require('auto-bind');
-const handleError = require("../../exceptions/handleError");
 
 class PlaylistsHandler {
     constructor(playlistsService, usersService, validator) {
         this._playlistsService = playlistsService;
         this._validator = validator;
         this._usersService = usersService;
-        autoBind(this); // mem-bind nilai this untuk seluruh method sekaligus
+        autoBind(this); 
     }
     async postPlaylistHandler(request, h) {
-        try {
             this._validator.validatePlaylistPayload(request.payload);
             const { name } = request.payload;
             const { id: credentialId } = request.auth.credentials;
@@ -24,12 +22,8 @@ class PlaylistsHandler {
             });
             response.code(201);
             return response;
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
-    async getPlaylistsHandler(request, h) {
-        try {
+    async getPlaylistsHandler(request) {
             const { id: credentialId } = request.auth.credentials;
             const playlists = await this._playlistsService.getPlaylists(credentialId);
             const playlistsProps = playlists.map((playlist) => ({
@@ -37,17 +31,12 @@ class PlaylistsHandler {
                 name: playlist.name,
                 username: playlist.username,
             }));
-
             return {
                 status: "success",
                 data: { playlists: playlistsProps },
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
-    async getPlaylistByIdHandler(request, h) {
-        try {
+    async getPlaylistByIdHandler(request) {
             const { id } = request.params;
             const { id: credentialId } = request.auth.credentials;
             await this._playlistsService.verifyPlaylistAccess(id, credentialId);
@@ -56,12 +45,8 @@ class PlaylistsHandler {
                 status: "success",
                 data: { playlist },
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
-    async putPlaylistByIdHandler(request, h) {
-        try {
+    async putPlaylistByIdHandler(request) {
             this._validator.validatePlaylistPayload(request.payload);
             const { id } = request.params;
             const { id: credentialId } = request.auth.credentials;
@@ -71,12 +56,8 @@ class PlaylistsHandler {
                 status: "success",
                 message: "Playlist berhasil diperbarui",
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
-    async deletePlaylistByIdHandler(request, h) {
-        try {
+    async deletePlaylistByIdHandler(request) {
             const { id } = request.params;
             const { id: credentialId } = request.auth.credentials;
             await this._playlistsService.verifyPlaylistOwner(id, credentialId);
@@ -85,9 +66,6 @@ class PlaylistsHandler {
                 status: "success",
                 message: "Playlist berhasil dihapus",
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
 }
 

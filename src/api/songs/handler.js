@@ -1,14 +1,12 @@
-const handleError = require("../../exceptions/handleError");
 const autoBind = require('auto-bind');
 
 class SongsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
-    autoBind(this); // mem-bind nilai this untuk seluruh method sekaligus
+    autoBind(this); 
   }
   async postSongHandler(request, h) {
-    try {
       this._validator.validateSongPayload(request.payload);
       const songId = await this._service.addSong(request.payload);
       const response = h.response({
@@ -18,12 +16,8 @@ class SongsHandler {
       });
       response.code(201);
       return response;
-    } catch (error) {
-      return handleError(error, h);
-    }
   }
-  async getSongsHandler(_request, h) {
-    try {
+  async getSongsHandler() {
       const songs = await this._service.getSongs();
       const songsProps = songs.map((song) => ({
         id: song.id,
@@ -34,24 +28,16 @@ class SongsHandler {
         status: "success",
         data: { songs: songsProps },
       };
-    } catch (error) {
-      return handleError(error, h);
-    }
   }
-  async getSongByIdHandler(request, h) {
-    try {
+  async getSongByIdHandler(request) {
       const { id } = request.params;
       const song = await this._service.getSongById(id);
       return {
         status: "success",
         data: { song },
       };
-    } catch (error) {
-      return handleError(error, h);
-    }
   }
-  async putSongByIdHandler(request, h) {
-    try {
+  async putSongByIdHandler(request) {
       this._validator.validateSongPayload(request.payload);
       const { id } = request.params;
       await this._service.editSongById(id, request.payload);
@@ -59,21 +45,14 @@ class SongsHandler {
         status: "success",
         message: "Lagu berhasil diperbarui",
       };
-    } catch (error) {
-      return handleError(error, h);
-    }
   }
-  async deleteSongByIdHandler(request, h) {
-    try {
+  async deleteSongByIdHandler(request) {
       const { id } = request.params;
       await this._service.deleteSongById(id);
       return {
         status: "success",
         message: "Lagu berhasil dihapus",
       };
-    } catch (error) {
-      return handleError(error, h);
-    }
   }
 }
 

@@ -1,15 +1,13 @@
 const autoBind = require('auto-bind');
-const handleError = require("../../exceptions/handleError");
 
 class PlaylistsongsHandler {
     constructor(playlistsongsService, playlistsService, validator) {
         this._playlistsongsService = playlistsongsService;
         this._playlistsService = playlistsService;
         this._validator = validator;
-        autoBind(this); // mem-bind nilai this untuk seluruh method sekaligus
+        autoBind(this); 
     }
     async postPlaylistsongHandler(request, h) {
-        try {
             this._validator.validatePlaylistsongPayload(request.payload);
             const { id: credentialId } = request.auth.credentials;
             const { songId } = request.payload;
@@ -23,12 +21,8 @@ class PlaylistsongsHandler {
             });
             response.code(201);
             return response;
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
-    async getPlaylistsongByIdHandler(request, h) {
-        try {
+    async getPlaylistsongByIdHandler(request) {
             const { id: credentialId } = request.auth.credentials;
             const { id: playlistId } = request.params;
             await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
@@ -44,12 +38,8 @@ class PlaylistsongsHandler {
                     songs: playlistsongsProps,
                 },
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
-    async deletePlaylistsongHandler(request, h) {
-        try {
+    async deletePlaylistsongHandler(request) {
             this._validator.validatePlaylistsongPayload(request.payload);
             const { id: credentialId } = request.auth.credentials;
             const { songId } = request.payload;
@@ -60,9 +50,6 @@ class PlaylistsongsHandler {
                 status: "success",
                 message: "Lagu berhasil dihapus",
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
     }
 }
 

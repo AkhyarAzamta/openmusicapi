@@ -1,5 +1,5 @@
 const autoBind = require('auto-bind');
-const handleError = require("../../exceptions/handleError");
+// const handleError = require("../../exceptions/handleError");
 
 class CollaborationsHandler {
     constructor(collaborationsService, playlistsService, validator) {
@@ -9,7 +9,7 @@ class CollaborationsHandler {
         autoBind(this); // mem-bind nilai this untuk seluruh method sekaligus
     }
     async postCollaborationHandler(request, h) {
-        try {
+        // try {
             this._validator.validateCollaborationPayload(request.payload);
             const { id: credentialId } = request.auth.credentials;
             const { playlistId, userId } = request.payload;
@@ -22,12 +22,12 @@ class CollaborationsHandler {
             });
             response.code(201);
             return response;
-        } catch (error) {
-            return handleError(error, h);
-        }
+        // } catch (error) {
+        //     return handleError(error, h);
+        // }
     }
-    async deleteCollaborationHandler(request, h) {
-        try {
+    async deleteCollaborationHandler(request) {
+        // try {
             this._validator.validateCollaborationPayload(request.payload);
             const { id: credentialId } = request.auth.credentials;
             const { playlistId, userId } = request.payload;
@@ -37,9 +37,9 @@ class CollaborationsHandler {
                 status: "success",
                 message: "Kolaborasi berhasil dihapus",
             };
-        } catch (error) {
-            return handleError(error, h);
-        }
+        // } catch (error) {
+        //     return handleError(error, h);
+        // }
     }
 }
 

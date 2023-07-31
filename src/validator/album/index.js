@@ -7,6 +7,7 @@ const AlbumValidator = {
         if (validationResult.error) {
             throw new InvariantError(validationResult.error.message);
         }
+        return validationResult.value;
     }
 };
 

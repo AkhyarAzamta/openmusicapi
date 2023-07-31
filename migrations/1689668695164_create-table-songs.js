@@ -34,6 +34,12 @@ exports.up = (pgm) => {
       type: "TEXT",
       notNull: true,
     },
+    album_id: {
+      type: 'varchar(30)',
+      references: '"albums"',
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+  },
   });
 };
 

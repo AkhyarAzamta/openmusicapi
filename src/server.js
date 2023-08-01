@@ -150,7 +150,6 @@ const init = async () => {
     server.ext('onPreResponse', (request, h) => {
         const { response } = request;
         if (response instanceof Error) {
-
             if (response instanceof NotFoundError) {
                 const newResponse = h.response({
                     status: 'fail',
@@ -199,15 +198,12 @@ const init = async () => {
             if (!response.isServer) {
                 return h.continue;
             }
-
             const newResponse = h.response({
                 status: 'error',
                 message: 'terjadi kegagalan pada server kami',
             });
-
             console.log(response);
             console.log(response.message);
-
             newResponse.code(500);
             return newResponse;
         }

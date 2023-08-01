@@ -49,9 +49,7 @@ class PlaylistsSongsService {
             text: "DELETE FROM playlistsongs WHERE song_id = $1 AND playlist_id = $2 RETURNING id",
             values: [songId, playlistId],
         };
-
         const result = await this._pool.query(query);
-
         if (!result.rows.length) {
             throw new InvariantError("Lagu gagal dihapus");
         }
@@ -62,9 +60,7 @@ class PlaylistsSongsService {
             text: "SELECT * FROM playlistsongs WHERE song_id = $1 AND playlist_id = $2",
             values: [songId, playlistId],
         };
-
         const result = await this._pool.query(query);
-
         if (!result.rows.length) {
             throw new InvariantError("Lagu gagal diverifikasi");
         }

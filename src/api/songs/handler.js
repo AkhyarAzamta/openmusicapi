@@ -17,8 +17,10 @@ class SongsHandler {
       response.code(201);
       return response;
   }
-  async getSongsHandler() {
-      const songs = await this._service.getSongs();
+  async getSongsHandler(request) {
+    const { title, performer } = request.query;
+      const songs = await this._service.getSongs(title, performer);
+console.log(songs)
       const songsProps = songs.map((song) => ({
         id: song.id,
         title: song.title,
@@ -32,9 +34,10 @@ class SongsHandler {
   async getSongByIdHandler(request) {
       const { id } = request.params;
       const song = await this._service.getSongById(id);
+      
       return {
         status: "success",
-        data: { song },
+        data: {song},
       };
   }
   async putSongByIdHandler(request) {

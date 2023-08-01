@@ -30,8 +30,24 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
-    const result = await this._pool.query("SELECT * FROM songs");
+  async getSongs(title, performer) {
+  //   const query = {
+  // text: "SELECT * FROM songs WHERE title LIKE $1 OR performer LIKE $2",
+  // values: [`%${title}%`,`%${performer}%`],
+// };
+    
+    let query = 'select * from songs';
+    
+    let wheres = [];
+    
+    if(title) wheres.push(`title LIKE '%${title}%'`);
+    if(performer) wheres.push(`performer LIKE '%${performer}%'`);
+    
+    if(wheres.length > 0) {
+        query += ' where ' + wheres.join(' AND ');
+    }
+console.log(query)
+    const result = await this._pool.query(query);
     return result.rows.map(mapDBToModel);
   }
 

@@ -25,11 +25,14 @@ class PlaylistsHandler {
     }
     async getPlaylistsHandler(request) {
             const { id: credentialId } = request.auth.credentials;
+
             const playlists = await this._playlistsService.getPlaylists(credentialId);
+            console.log(playlists)
             const playlistsProps = playlists.map((playlist) => ({
                 id: playlist.id,
                 name: playlist.name,
                 username: playlist.username,
+                // songs: playlist.songs
             }));
             return {
                 status: "success",

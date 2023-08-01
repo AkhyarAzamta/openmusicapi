@@ -27,6 +27,8 @@ class PlaylistsongsHandler {
             const { id: playlistId } = request.params;
             await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
             const playlistsongs = await this._playlistsongsService.getPlaylistsongById(playlistId);
+            console.log(playlistsongs)
+            
             const playlistsongsProps = playlistsongs.map((playlistsong) => ({
                 id: playlistsong.id,
                 title: playlistsong.title,

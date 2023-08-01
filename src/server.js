@@ -1,12 +1,16 @@
 /* eslint-disable no-undef */
-const ClientError = require("./exceptions/ClientError");
+require("dotenv").config();
 
 // mengimpor dotenv dan menjalankan konfigurasinya
-require("dotenv").config();
 
 const Hapi = require("@hapi/hapi");
 const Jwt = require("@hapi/jwt");
 
+// const ClientError = require("./exceptions/ClientError");
+const ClientError = require('../src/exceptions/ClientError');
+const NotFoundError = require('../src/exceptions/NotFoundError');
+const AuthorizationError = require('../src/exceptions/AuthorizationError');
+const AuthenticationError = require('../src/exceptions/AuthenticationError');
 // songs
 const songs = require("./api/songs");
 const SongsService = require("./services/postgres/SongService");
@@ -144,32 +148,69 @@ const init = async () => {
     ]);
 
     server.ext('onPreResponse', (request, h) => {
-        // mendapatkan konteks response dari request
         const { response } = request;
         if (response instanceof Error) {
 
-            // penanganan client error secara internal.
-            if (response instanceof ClientError) {
+            if (response instanceof NotFoundError) {
                 const newResponse = h.response({
                     status: 'fail',
-                    message: response.message,
+                    message: 'Data tidak ditemukan',
                 });
                 newResponse.code(response.statusCode);
                 return newResponse;
             }
-            // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
+
+            if (response instanceof AuthorizationError) {
+                const newResponse = h.response({
+                    status: 'fail',
+                    message: 'Anda tidak berhak mengakses resource ini',
+                });
+                newResponse.code(response.statusCode);
+                return newResponse;
+            }
+
+            if (response instanceof ClientError) {
+                const newResponse = h.response({
+                    status: 'fail',
+                    message: 'Gagal karena request tidak sesuai',
+                });
+                newResponse.code(response.statusCode);
+                return newResponse;
+            }
+
+            if (response instanceof AuthenticationError) {
+                const newResponse = h.response({
+                    status: 'fail',
+                    message: 'Anda dibatasi untuk mengakses resource ini',
+                });
+                newResponse.code(response.statusCode);
+                return newResponse;
+            }
+
+            if (response instanceof ClientError) {
+                const newResponse = h.response({
+                    status: 'fail',
+                    message: 'Gagal karena refresh token tidak valid',
+                });
+                newResponse.code(response.statusCode);
+                return newResponse;
+            }
+
             if (!response.isServer) {
                 return h.continue;
             }
-            // penanganan server error sesuai kebutuhan
+
             const newResponse = h.response({
                 status: 'error',
                 message: 'terjadi kegagalan pada server kami',
             });
+
+            console.log(response);
+            console.log(response.message);
+
             newResponse.code(500);
             return newResponse;
         }
-        // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
         return h.continue;
     });
 

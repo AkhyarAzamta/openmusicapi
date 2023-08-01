@@ -1,8 +1,8 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
 const InvariantError = require("../../exceptions/InvariantError");
-const { mapDBToModel } = require("../../utils");
-const NotFoundError = require("../../exceptions/NotFoundError");
+const { mapDBToSongPlaylist } = require("../../utils");
+// const NotFoundError = require("../../exceptions/NotFoundError");
 
 class PlaylistsSongsService {
     constructor() {
@@ -24,18 +24,24 @@ class PlaylistsSongsService {
         return result.rows[0].id;
     }
 
-    async getPlaylistsongById(id) {
-        const query = {
-            text: `SELECT playlistsongs.*, songs.title, songs.performer FROM playlistsongs LEFT JOIN songs ON songs.id = playlistsongs.song_id 
-            WHERE playlistsongs.playlist_id = $1`,
-            values: [id],
+    async getPlaylistsongById(playlistId) {
+        const queryPlaylist = {
+            text: `SELECT playlists.id, playlists.name, users.username FROM playlists
+            LEFT JOIN users on playlists.owner = users.id
+            WHERE playlists.id = $1`,
+            values: [playlistId],
         };
-        const result = await this._pool.query(query);
+        const querySong = {
+            text: `SELECT songs.id, songs.title, songs.performer FROM playlistsongs
+            JOIN songs on playlistsongs.song_id = songs.id
+            WHERE playlist_id = $1`,
+            values: [playlistId],
+        };
 
-        if (!result.rows.length) {
-            throw new NotFoundError("Playlist tidak ditemukan");
-        }
-        return result.rows.map(mapDBToModel);
+        const resultPlaylist = await this._pool.query(queryPlaylist);
+        const resultSongs = await this._pool.query(querySong);
+
+        return mapDBToSongPlaylist(resultPlaylist.rows[0], resultSongs.rows);
     }
 
     async deletePlaylistsong(songId, playlistId) {

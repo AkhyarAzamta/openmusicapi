@@ -11,11 +11,8 @@ class PlaylistsService {
         this._collaborationService = collaborationService;
     }
 
-    async addPlaylist({
-        name, owner,
-    }) {
+    async addPlaylist({ name, owner,}) {
         const id = `playlist-${nanoid(16)}`;
-
         const query = {
             text: "INSERT INTO playlists VALUES($1, $2, $3) RETURNING id",
             values: [id, name, owner],

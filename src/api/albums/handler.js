@@ -1,4 +1,4 @@
-const { mapDBToModel } = require('../../utils/index')
+const { mapDBToAlbumSongService } = require('../../utils/index')
 const autoBind = require('auto-bind');
 
 class AlbumsHandler {
@@ -24,7 +24,7 @@ class AlbumsHandler {
   async getAlbumByIdHandler(request, h) {
     const {albumId} = request.params;
     const album = await this._service.getAlbumById(albumId);
-    const resultAlbum = mapDBToModel(album.album, album.songs);
+    const resultAlbum = mapDBToAlbumSongService(album.album, album.songs);
     const response = h.response({
         status: 'success',
         data: {
@@ -36,8 +36,8 @@ class AlbumsHandler {
 
   async updateAlbumByIdHandler(request, h) {
     const albumValidated = this._validator.validateAlbumPayload(request.payload);
-    const {id} = request.params;
-    await this._service.editAlbumById(id, albumValidated);
+    const {albumId} = request.params;
+    await this._service.updateAlbumById(albumId, albumValidated);
     const response = h.response({
         status: 'success',
         message: 'Album berhasil diperbarui',
@@ -46,8 +46,8 @@ class AlbumsHandler {
   }
 
   async deleteAlbumByIdHandler(request, h) {
-    const {id} = request.params;
-    await this._service.deleteAlbumById(id);
+    const {albumId} = request.params;
+    await this._service.deleteAlbumById(albumId);
     const response = h.response({
         status: 'success',
         message: 'Album berhasil dihapus',

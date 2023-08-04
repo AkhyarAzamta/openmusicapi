@@ -11,4 +11,4 @@ const PlaylistsongsValidator = {
     },
 };
 
-module.exports = PlaylistsongsValidator;
+module.exports = {PlaylistsongsValidator};

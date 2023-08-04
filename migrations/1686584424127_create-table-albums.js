@@ -1,23 +1,22 @@
-// eslint-disable-next-line camelcase
 /* eslint-disable camelcase */
 
-exports.up = pgm => {
+exports.up = (pgm) => {
   pgm.createTable('albums', {
-    id: {
+    album_id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
     name: {
-      type: 'VARCHAR(255)',
+      type: 'TEXT',
       notNull: true,
     },
     year: {
-      type: 'integer',
+      type: 'INTEGER',
       notNull: true,
     },
   });
 };
 
-exports.down = pgm => {
-  pgm.dropTable('albums'); 
+exports.down = (pgm) => {
+  pgm.dropTable('albums');
 };

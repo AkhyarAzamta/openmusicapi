@@ -1,48 +1,37 @@
 /* eslint-disable camelcase */
 
 exports.up = (pgm) => {
-  pgm.createTable("songs", {
+  pgm.createTable('songs', {
     id: {
-      type: "VARCHAR(50)",
+      type: 'VARCHAR(50)',
       primaryKey: true,
     },
     title: {
-      type: "TEXT",
+      type: 'TEXT',
       notNull: true,
     },
     year: {
-      type: "INT",
-      notNull: true,
-    },
-    performer: {
-      type: "TEXT",
+      type: 'INTEGER',
       notNull: true,
     },
     genre: {
-      type: "TEXT",
-      notNull: false,
+      type: 'TEXT',
+      notNull: true,
+    },
+    performer: {
+      type: 'TEXT',
+      notNull: true,
     },
     duration: {
-      type: "INT",
-      notNull: false,
-    },
-    inserted_at: {
-      type: "TEXT",
-      notNull: true,
-    },
-    updated_at: {
-      type: "TEXT",
-      notNull: true,
+      type: 'INTEGER',
     },
     album_id: {
-      type: 'varchar(30)',
-      references: '"albums"',
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-  },
+      type: 'VARCHAR(50)',
+      references: 'albums',
+    },
   });
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable("songs");
+  pgm.dropTable('songs');
 };

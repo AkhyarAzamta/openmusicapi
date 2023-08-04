@@ -1,42 +1,50 @@
 const routes = (handler) => [
     {
-        method: "POST",
-        path: "/playlists",
-        handler: handler.postPlaylistHandler,
+        method: 'POST',
+        path: '/playlists',
+        handler: (request, h) => handler.postPlaylistHandler(request, h),
         options: {
-            auth: "playlistsapp_jwt",
+            auth: 'openmusic_jwt',
         },
     },
     {
-        method: "GET",
-        path: "/playlists",
-        handler: handler.getPlaylistsHandler,
+        method: 'POST',
+        path: '/playlists/{id}/songs',
+        handler: (request, h) => handler.postPlaylistSongByIdHandler(request, h),
         options: {
-            auth: "playlistsapp_jwt",
+            auth: 'openmusic_jwt',
         },
     },
     {
-        method: "GET",
-        path: "/playlists/{id}",
-        handler: handler.getPlaylistByIdHandler,
+        method: 'GET',
+        path: '/playlists',
+        handler: (request) => handler.getAllPlaylistsHandler(request),
         options: {
-            auth: "playlistsapp_jwt",
+            auth: 'openmusic_jwt',
         },
     },
     {
-        method: "PUT",
-        path: "/playlists/{id}",
-        handler: handler.putPlaylistByIdHandler,
+        method: 'GET',
+        path: '/playlists/{id}/songs',
+        handler: (request) => handler.getPlaylistSongsByIdHandler(request),
         options: {
-            auth: "playlistsapp_jwt",
+            auth: 'openmusic_jwt',
         },
     },
     {
-        method: "DELETE",
-        path: "/playlists/{id}",
-        handler: handler.deletePlaylistByIdHandler,
+        method: 'DELETE',
+        path: '/playlists/{id}',
+        handler: (request) => handler.deletePlaylistByIdHandler(request),
         options: {
-            auth: "playlistsapp_jwt",
+            auth: 'openmusic_jwt',
+        },
+    },
+    {
+        method: 'DELETE',
+        path: '/playlists/{id}/songs',
+        handler: (request) => handler.deletePlaylistSongByIdHandler(request),
+        options: {
+            auth: 'openmusic_jwt',
         },
     },
 ];

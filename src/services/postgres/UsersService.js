@@ -1,9 +1,8 @@
-const { nanoid } = require("nanoid");
-const { Pool } = require("pg");
-const bcrypt = require("bcrypt");
-const InvariantError = require("../../exceptions/InvariantError");
-const NotFoundError = require("../../exceptions/NotFoundError");
-const AuthenticationError = require("../../exceptions/AuthenticationError");
+const { nanoid } = require('nanoid');
+const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
+const InvariantError = require('../../exceptions/InvariantError');
+const AuthenticationError = require('../../exceptions/AuthenticationError');
 
 class UsersService {
     constructor() {
@@ -16,75 +15,51 @@ class UsersService {
         const id = `user-${nanoid(16)}`;
         const hashedPassword = await bcrypt.hash(password, 10);
         const query = {
-            text: "INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id",
+            text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING user_id',
             values: [id, username, hashedPassword, fullname],
         };
+        const { rows, rowCount } = await this._pool.query(query);
 
-        const result = await this._pool.query(query);
-
-        if (!result.rows.length) {
-            throw new InvariantError("User gagal ditambahkan");
+        if (!rowCount) {
+            throw new InvariantError('User gagal ditambahkan');
         }
-        return result.rows[0].id;
+
+        return rows[0].user_id;
     }
 
     async verifyNewUsername(username) {
         const query = {
-            text: "SELECT username FROM users WHERE username = $1",
+            text: 'SELECT username FROM users WHERE username = $1',
             values: [username],
         };
+        const { rowCount } = await this._pool.query(query);
 
-        const result = await this._pool.query(query);
-
-        if (result.rows.length > 0) {
-            throw new InvariantError("Gagal menambahkan user. Username sudah digunakan.");
+        if (rowCount) {
+            throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
         }
-    }
-
-    async getUserById(userId) {
-        const query = {
-            text: "SELECT id, username, fullname FROM users WHERE id = $1",
-            values: [userId],
-        };
-
-        const result = await this._pool.query(query);
-
-        if (!result.rows.length) {
-            throw new NotFoundError("User tidak ditemukan");
-        }
-
-        return result.rows[0];
     }
 
     async verifyUserCredential(username, password) {
         const query = {
-            text: "SELECT id, password FROM users WHERE username = $1",
+            text: 'SELECT user_id, password FROM users WHERE username = $1',
             values: [username],
         };
-        const result = await this._pool.query(query);
+        // console.log(password)
+        const { rows, rowCount } = await this._pool.query(query);
 
-        if (!result.rows.length) {
-            throw new AuthenticationError("Kredensial yang Anda berikan salah");
+        if (!rowCount) {
+            throw new AuthenticationError('Kredensial yang Anda berikan salah.');
         }
-
-        const { id, password: hashedPassword } = result.rows[0];
-
+        
+        const { user_id: id, password: hashedPassword } = rows[0];
+        
         const match = await bcrypt.compare(password, hashedPassword);
-
         if (!match) {
-            throw new AuthenticationError("Kredensial yang Anda berikan salah");
+            throw new AuthenticationError('Kredensial yang Anda berikan salah.');
         }
-        return id;
-    }
 
-    async getUsersByUsername(username) {
-        const query = {
-            text: "SELECT id, username, fullname FROM users WHERE username LIKE $1",
-            values: [`%${username}%`],
-        };
-        const result = await this._pool.query(query);
-        return result.rows;
+        return id;
     }
 }
 
-module.exports = UsersService;
+module.exports = { UsersService };

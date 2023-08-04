@@ -1,18 +1,13 @@
 const routes = (handler) => [
     {
-        method: "POST",
-        path: "/users",
-        handler: handler.postUserHandler,
+        method: 'POST',
+        path: '/users',
+        handler: (request, h) => handler.postUserHandler(request, h),
     },
     {
-        method: "GET",
-        path: "/users/{id}",
-        handler: handler.getUserByIdHandler,
-    },
-    {
-        method: "GET",
-        path: "/users",
-        handler: handler.getUsersByUsernameHandler,
+        method: 'GET',
+        path: '/users/{id}',
+        handler: (request) => handler.getUserByIdHandler(request),
     },
 ];
 

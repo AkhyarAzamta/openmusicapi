@@ -5,20 +5,28 @@ const routes = (handler) => [
     handler: (request, h) => handler.postAlbumHandler(request, h),
   },
   {
+    method: 'POST',
+    path: '/albums/{id}/likes',
+    handler: (request, h) => handler.postAlbumLikesByIdHandler(request, h),
+    options: {
+      auth: 'openmusic_jwt',
+    },
+  },
+  {
     method: 'GET',
-    path: '/albums/{albumId}',
-    handler: (request, h) => handler.getAlbumByIdHandler(request, h),
+    path: '/albums/{id}',
+    handler: (request) => handler.getAlbumByIdHandler(request),
   },
   {
     method: 'PUT',
-    path: '/albums/{albumId}',
-    handler: (request, h) => handler.updateAlbumByIdHandler(request, h),
+    path: '/albums/{id}',
+    handler: (request) => handler.putAlbumByIdHandler(request),
   },
   {
     method: 'DELETE',
-    path: '/albums/{albumId}',
-    handler: (request, h) => handler.deleteAlbumByIdHandler(request, h),
-  }
-]
+    path: '/albums/{id}',
+    handler: (request) => handler.deleteAlbumByIdHandler(request),
+  },
+];
 
 module.exports = routes;

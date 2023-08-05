@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
@@ -6,34 +5,34 @@ const Jwt = require('@hapi/jwt');
 
 const ClientError = require('./exceptions/ClientError');
 
-const albums = require('./api/albums');
-const { AlbumsService } = require('./services/postgres/AlbumsService');
-const { AlbumsValidator } = require('./validator/albums');
+const users = require('./api/users');
+const { UsersService } = require('./services/postgres/UsersService');
+const UsersValidator = require('./validator/users');
 
 const songs = require('./api/songs');
 const { SongsService } = require('./services/postgres/SongsService');
-const { SongsValidator } = require('./validator/songs');
-
-const users = require('./api/users');
-const { UsersService } = require('./services/postgres/UsersService');
-const { UsersValidator } = require('./validator/users');
-
-const authentications = require('./api/authentications');
-const { AuthenticationsService } = require('./services/postgres/AuthenticationsService');
-const TokenManager = require('./tokenize/TokenManager');
-const { AuthenticationsValidator } = require('./validator/authentications');
+const SongsValidator = require('./validator/songs');
 
 const playlist = require('./api/playlists');
 const { PlaylistsService } = require('./services/postgres/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
 
-const activities = require('./api/activities');
-const { ActivitiesService } = require('./services/postgres/ActivitiesService');
-const { ActivitiesValidator } = require('./validator/activities');
+const albums = require('./api/albums');
+const { AlbumsService } = require('./services/postgres/AlbumsService');
+const AlbumsValidator = require('./validator/albums');
+
+const authentications = require('./api/authentications');
+const { AuthenticationsService } = require('./services/postgres/AuthenticationsService');
+const TokenManager = require('./tokenize/TokenManager');
+const AuthenticationsValidator = require('./validator/authentications');
 
 const collaborations = require('./api/collaborations');
 const { CollaborationsService } = require('./services/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
+
+const activities = require('./api/activities');
+const { ActivitiesService } = require('./services/postgres/ActivitiesService');
+const ActivitiesValidator = require('./validator/activities');
 
 const init = async () => {
     const albumsService = new AlbumsService();
@@ -99,19 +98,19 @@ const init = async () => {
             },
         },
         {
+            plugin: playlist,
+            options: {
+                service: playlistsService,
+                validator: PlaylistsValidator,
+            },
+        },
+        {
             plugin: authentications,
             options: {
                 authenticationsService,
                 usersService,
                 tokenManager: TokenManager,
                 validator: AuthenticationsValidator,
-            },
-        },
-        {
-            plugin: playlist,
-            options: {
-                service: playlistsService,
-                validator: PlaylistsValidator,
             },
         },
         {

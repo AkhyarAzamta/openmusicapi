@@ -4,18 +4,15 @@ class SongsHandler {
     this._validator = validator;
   }
 
-  async postSongHandler(request, h) {
-    this._validator.validateSongPayload(request.payload);
-    const songId = await this._service.addSong(request.payload);
-    const response = h.response({
+  async getSongByIdHandler(request) {
+    const { id } = request.params;
+    const song = await this._service.getSongById(id);
+    return {
       status: 'success',
-      message: 'Lagu berhasil ditambahkan',
       data: {
-        songId,
+        song,
       },
-    });
-    response.code(201);
-    return response;
+    };
   }
 
   async getSongsHandler(request) {
@@ -29,15 +26,18 @@ class SongsHandler {
     };
   }
 
-  async getSongByIdHandler(request) {
-    const { id } = request.params;
-    const song = await this._service.getSongById(id);
-    return {
+  async postSongHandler(request, h) {
+    this._validator.validateSongPayload(request.payload);
+    const songId = await this._service.addSong(request.payload);
+    const response = h.response({
       status: 'success',
+      message: 'Lagu berhasil ditambahkan',
       data: {
-        song,
+        songId,
       },
-    };
+    });
+    response.code(201);
+    return response;
   }
 
   async editSongByIdHandler(request) {
